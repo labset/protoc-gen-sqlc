@@ -5,7 +5,10 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-func ProtoFile(file *descriptorpb.FileDescriptorProto, response *pluginpb.CodeGeneratorResponse) error {
+func ProtoFile(
+	file *descriptorpb.FileDescriptorProto,
+	response *pluginpb.CodeGeneratorResponse,
+) error {
 	messages := file.GetMessageType()
 	if len(messages) == 0 {
 		return nil

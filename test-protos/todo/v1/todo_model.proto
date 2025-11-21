@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "sqlc/v1/options.proto";
+
+package todo.v1;
+
+message Todo {
+  option(sqlc.v1.sqlc_table) = "todos";
+
+  string id = 1 [(sqlc.v1.sqlc_pk) = "id"];
+  string title = 2;
+}

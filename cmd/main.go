@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/viqueen/go-protoc-gen-plugin/internal/handler"
 	"io"
 	"log"
 	"os"
+
+	"github.com/labset/protoc-gen-sqlc/internal/handler"
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/pluginpb"
