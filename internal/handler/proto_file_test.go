@@ -38,4 +38,13 @@ func TestProtoFile(t *testing.T) {
 		err = ProtoFile(descriptor, response)
 		require.NoError(t, err)
 	}
+
+	require.Len(t, response.File, 1, "Expected exactly one generated file")
+
+	generatedFile := response.File[0]
+	require.Equal(t, "sqlc.yaml", *generatedFile.Name, "Expected generated file to be sqlc.yaml")
+	require.NotNil(t, generatedFile.Content, "Generated file content should not be nil")
+	require.Contains(t, *generatedFile.Content, "version: \"2\"", "Expected version 2 in sqlc.yaml")
+	require.Contains(t, *generatedFile.Content, "name: todo", "Expected todo domain in sqlc.yaml")
+	require.Contains(t, *generatedFile.Content, "package: todo_gendb", "Expected todo_gendb package in sqlc.yaml")
 }
