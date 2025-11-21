@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# @VERSION 1.0.0
+
+source "./bin/with_docs.sh"
+
+DOCKER_FLAGS="--rm --volume ${PWD}:/workspace --workdir /workspace"
+
+if [[ -z "$CI" ]]; then
+    DOCKER_FLAGS="$DOCKER_FLAGS -it"
+fi
+
+# @COMMAND  lint    Run golangci-lint on the codebase
+function lint() {
+  set -ex
+  docker run ${DOCKER_FLAGS} \
+  		golangci/golangci-lint:v2.5.0 \
+  		golangci-lint run "$@"
+}
+
+# @COMMAND  build   Build the project using goreleaser
+function build() {
+  set -ex
+  docker run ${DOCKER_FLAGS} \
+    goreleaser/goreleaser:v2.12.7 \
+    build --clean --snapshot
+}
+
+# @COMMAND  buf     Run buf commands inside a buf docker container
+function buf() {
+  set -ex
+  docker run ${DOCKER_FLAGS} \
+     bufbuild/buf:1.46.0 "$@"
+}
+
+eval "$@"

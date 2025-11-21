@@ -1,0 +1,23 @@
+name: buf
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  buf:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bufbuild/buf-action@v1
+        with:
+          token: ${{ secrets.BUF_TOKEN }}
+          setup_only: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
