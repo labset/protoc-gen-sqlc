@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package sqlc.v1;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MessageOptions {
+  string sqlc_table = 80000;
+}
+
+extend google.protobuf.FieldOptions {
+  string sqlc_pk = 80001;
+}
+
+extend google.protobuf.FieldOptions {
+  string sqlc_fk = 80002;
+}

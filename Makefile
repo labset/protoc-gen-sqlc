@@ -1,6 +1,6 @@
 .PHONY: lint build
 
-DOCKER_FLAGS := --rm --volume ${PWD}:/go/src --workdir /go/src
+DOCKER_FLAGS := --rm --volume ${PWD}:/workspace --workdir /workspace
 ifeq ($(CI),)
 	DOCKER_FLAGS += -it
 endif
@@ -22,3 +22,8 @@ build:
 	docker run $(DOCKER_FLAGS) \
 		goreleaser/goreleaser:v2.12.7 \
 		build --clean --snapshot
+
+.PHONY: codegen
+codegen:
+	docker run $(DOCKER_FLAGS) \
+		 bufbuild/buf:1.46.0 generate
