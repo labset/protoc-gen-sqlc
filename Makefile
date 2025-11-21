@@ -23,7 +23,9 @@ build:
 		goreleaser/goreleaser:v2.12.7 \
 		build --clean --snapshot
 
-.PHONY: codegen
-codegen:
+
+ACTION := generate
+.PHONY: buf
+buf:
 	docker run $(DOCKER_FLAGS) \
-		 bufbuild/buf:1.46.0 generate
+		 bufbuild/buf:1.46.0 ${ACTION}
