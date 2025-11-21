@@ -29,7 +29,7 @@ function build() {
 # @COMMAND  buf     Run buf commands inside a buf docker container
 function buf() {
   set -ex
-  docker run ${OCKER_FLAGS} \
+  docker run ${DOCKER_FLAGS} \
      bufbuild/buf:1.46.0 "$@"
 }
 
