@@ -1,12 +1,12 @@
 package main
 
 import (
+	"github.com/viqueen/go-protoc-gen-plugin/internal/handler"
 	"io"
 	"log"
 	"os"
 
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
@@ -23,25 +23,12 @@ func main() {
 
 	response := &pluginpb.CodeGeneratorResponse{}
 	for _, protoFile := range request.GetProtoFile() {
-		processFile(protoFile, response)
+		if err = handler.ProtoFile(protoFile, response); err != nil {
+			log.Fatalf("failed to process proto file: %v", err)
+		}
 	}
 
 	respond(response)
-}
-
-func processFile(
-	protoFile *descriptorpb.FileDescriptorProto,
-	response *pluginpb.CodeGeneratorResponse,
-) {
-	services := protoFile.GetService()
-	for _, service := range services {
-		log.Printf("service: %v", service)
-
-		methods := service.GetMethod()
-		for _, method := range methods {
-			log.Printf("method: %v", method)
-		}
-	}
 }
 
 func respond(response *pluginpb.CodeGeneratorResponse) {
