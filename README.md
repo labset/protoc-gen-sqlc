@@ -1,4 +1,4 @@
-## go-protoc-gen-plugin
+## protoc-gen-sqlc
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=viqueen_protoc-gen-plugin&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=viqueen_protoc-gen-plugin)
 
@@ -13,10 +13,10 @@ Template repository for creating protoc plugins in Go.
 
 ```bash
 # Lint
-make lint
+./bin/task lint
 
 # Build (creates dist/ with cross-platform binaries)
-make build
+./bin/task build
 
 # Install locally
 go install ./cmd
