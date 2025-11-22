@@ -39,11 +39,3 @@ func ProcessProtoFiles(
 	//   migrations/
 	return nil
 }
-
-// Keep for backwards compatibility and testing
-func ProtoFile(
-	file *descriptorpb.FileDescriptorProto,
-	response *pluginpb.CodeGeneratorResponse,
-) error {
-	return ProcessProtoFiles([]*descriptorpb.FileDescriptorProto{file}, response)
-}

@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"os"
 	"path/filepath"
 	"testing"
@@ -13,7 +14,7 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-func TestProtoFile(t *testing.T) {
+func TestProcessProtoFiles(t *testing.T) {
 	t.Parallel()
 
 	cwd, err := os.Getwd()
@@ -32,13 +33,14 @@ func TestProtoFile(t *testing.T) {
 	fileDescriptors, err := compiler.Compile(context.Background(), todoModelProto)
 	require.NoError(t, err)
 
+	protoDescriptors := make([]*descriptorpb.FileDescriptorProto, len(fileDescriptors))
+	for i, fd := range fileDescriptors {
+		protoDescriptors[i] = protoutil.ProtoFromFileDescriptor(fd)
+	}
 	response := &pluginpb.CodeGeneratorResponse{}
 
-	for _, fileDescriptor := range fileDescriptors {
-		descriptor := protoutil.ProtoFromFileDescriptor(fileDescriptor)
-		err = ProtoFile(descriptor, response)
-		require.NoError(t, err)
-	}
+	err = ProcessProtoFiles(protoDescriptors, response)
+	require.NoError(t, err)
 
 	require.Len(t, response.File, 1, "Expected exactly one generated file")
 
