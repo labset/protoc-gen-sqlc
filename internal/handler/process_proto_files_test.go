@@ -49,5 +49,5 @@ func TestProcessProtoFiles(t *testing.T) {
 	require.NotNil(t, generatedFile.Content, "Generated file content should not be nil")
 	assert.Contains(t, *generatedFile.Content, "version: \"2\"", "Expected version 2 in sqlc.yaml")
 	assert.Contains(t, *generatedFile.Content, "name: todo", "Expected todo domain in sqlc.yaml")
-	assert.Contains(t, *generatedFile.Content, "package: todo_gendb", "Expected todo_gendb package in sqlc.yaml")
+	assert.Contains(t, *generatedFile.Content, "package: gendb_todo", "Expected gendb_todo package in sqlc.yaml")
 }
