@@ -24,7 +24,10 @@ func ProcessProtoFiles(
 	return nil
 }
 
-func handleConfig(files []*descriptorpb.FileDescriptorProto, response *pluginpb.CodeGeneratorResponse) {
+func handleConfig(
+	files []*descriptorpb.FileDescriptorProto,
+	response *pluginpb.CodeGeneratorResponse,
+) {
 	domains := make(map[string]bool)
 
 	for _, file := range files {

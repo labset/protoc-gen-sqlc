@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "sqlc/v1/options.proto";
+
+package music.v1;
+
+message Album {
+  option(sqlc.v1.sqlc_table) = "album";
+
+  string id = 1;
+  string name = 2;
+  int64 bitmap_index = 3;
+}
+
+message Track {
+  option(sqlc.v1.sqlc_table) = "track";
+
+  string id = 1;
+  string name = 2;
+  string album_id = 3 [(sqlc.v1.sqlc_fk) = "album.id"];
+  int64 bitmap_index = 4;
+  bool is_published = 5;
+}

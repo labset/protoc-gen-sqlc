@@ -1,7 +1,6 @@
 package codegen
 
 import (
-	"fmt"
 	"google.golang.org/protobuf/types/pluginpb"
 	"gopkg.in/yaml.v3"
 )
@@ -38,12 +37,12 @@ func generateSqlConfig(domain string) SqlConfig {
 	return SqlConfig{
 		Engine:  "postgresql",
 		Name:    domain,
-		Queries: fmt.Sprintf("./data/queries/%s", domain),
+		Queries: "./data/queries/" + domain,
 		Schema:  "./data/migrations/*.sql",
 		Gen: GenConfig{
 			Go: GoConfig{
-				Package:                  fmt.Sprintf("gendb_%s", domain),
-				Out:                      fmt.Sprintf("./internal/gendb/%s", domain),
+				Package:                  "gendb_" + domain,
+				Out:                      "./internal/gendb/" + domain,
 				EmitResultStructPointers: true,
 				EmitParamsStructPointers: true,
 				EmitPreparedQueries:      true,
@@ -78,5 +77,6 @@ func generateYamlContent(config SqlcConfig) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return string(yamlBytes), nil
 }

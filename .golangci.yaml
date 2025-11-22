@@ -44,3 +44,4 @@ linters:
             - github.com/bufbuild/protocompile
             - github.com/stretchr/testify
             - google.golang.org/protobuf
+            - gopkg.in/yaml.v3
