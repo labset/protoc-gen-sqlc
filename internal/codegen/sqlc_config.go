@@ -55,12 +55,35 @@ func GenerateSqlcConfigFile(file *descriptorpb.FileDescriptorProto) *pluginpb.Co
 		return nil
 	}
 
-	domain, version := extractDomainAndVersion(packageName)
+	domain := ExtractDomain(packageName)
 	if domain == "" {
 		return nil
 	}
 
-	config := generateSqlcConfig(domain, version)
+	return GenerateSqlcConfigFileForDomains([]string{domain})
+}
+
+func GenerateSqlcConfigFileForDomains(domains []string) *pluginpb.CodeGeneratorResponse_File {
+	if len(domains) == 0 {
+		return nil
+	}
+
+	// Remove duplicates
+	uniqueDomains := make(map[string]bool)
+	var sqlConfigs []SqlConfig
+	
+	for _, domain := range domains {
+		if !uniqueDomains[domain] {
+			uniqueDomains[domain] = true
+			sqlConfigs = append(sqlConfigs, generateSqlConfig(domain))
+		}
+	}
+
+	config := SqlcConfig{
+		Version: "2",
+		Sql:     sqlConfigs,
+	}
+
 	configContent, err := generateYamlContent(config)
 	if err != nil {
 		return nil
@@ -72,6 +95,24 @@ func GenerateSqlcConfigFile(file *descriptorpb.FileDescriptorProto) *pluginpb.Co
 	}
 }
 
+func ExtractDomain(packageName string) string {
+	parts := strings.Split(packageName, ".")
+	if len(parts) < 2 {
+		return ""
+	}
+	
+	// Support patterns:
+	// domain.version (e.g., todo.v1) 
+	// domain.subdomain.version (e.g., user.auth.v1)
+	if len(parts) == 2 {
+		return parts[0] // todo
+	} else if len(parts) >= 3 {
+		return parts[0] + "_" + parts[1] // user_auth
+	}
+	
+	return ""
+}
+
 func extractDomainAndVersion(packageName string) (string, string) {
 	parts := strings.Split(packageName, ".")
 	if len(parts) < 2 {
@@ -79,47 +120,42 @@ func extractDomainAndVersion(packageName string) (string, string) {
 	}
 	
 	domain := parts[0]
-	version := parts[1]
+	version := parts[len(parts)-1] // last part is always version
 	
 	return domain, version
 }
 
-func generateSqlcConfig(domain, version string) SqlcConfig {
-	return SqlcConfig{
-		Version: "2",
-		Sql: []SqlConfig{
-			{
-				Engine:  "postgresql",
-				Name:    domain,
-				Queries: fmt.Sprintf("./data/queries/%s", domain),
-				Schema:  fmt.Sprintf("./data/migrations/*_%s_*.sql", domain),
-				Gen: GenConfig{
-					Go: GoConfig{
-						Package:                     fmt.Sprintf("%s_gendb", domain),
-						Out:                         fmt.Sprintf("./internal/domain/%s/gendb", domain),
-						EmitResultStructPointers:    true,
-						EmitParamsStructPointers:    true,
-						EmitPreparedQueries:         true,
-						EmitExportedQueries:         true,
-						EmitInterface:               true,
-						EmitJsonTags:                true,
-						Overrides: []Override{
-							{
-								DbType: "uuid.UUID",
-								GoType: GoType{
-									Import:  "github.com/gofrs/uuid/v5",
-									Package: "uuid",
-									Type:    "UUID",
-								},
-							},
-							{
-								DbType: "uuid.NullUUID",
-								GoType: GoType{
-									Import:  "github.com/gofrs/uuid/v5",
-									Package: "uuid",
-									Type:    "NullUUID",
-								},
-							},
+func generateSqlConfig(domain string) SqlConfig {
+	return SqlConfig{
+		Engine:  "postgresql",
+		Name:    domain,
+		Queries: fmt.Sprintf("./data/queries/%s", domain),
+		Schema:  fmt.Sprintf("./data/migrations/*_%s_*.sql", domain),
+		Gen: GenConfig{
+			Go: GoConfig{
+				Package:                     fmt.Sprintf("%s_gendb", domain),
+				Out:                         fmt.Sprintf("./internal/domain/%s/gendb", domain),
+				EmitResultStructPointers:    true,
+				EmitParamsStructPointers:    true,
+				EmitPreparedQueries:         true,
+				EmitExportedQueries:         true,
+				EmitInterface:               true,
+				EmitJsonTags:                true,
+				Overrides: []Override{
+					{
+						DbType: "uuid.UUID",
+						GoType: GoType{
+							Import:  "github.com/gofrs/uuid/v5",
+							Package: "uuid",
+							Type:    "UUID",
+						},
+					},
+					{
+						DbType: "uuid.NullUUID",
+						GoType: GoType{
+							Import:  "github.com/gofrs/uuid/v5",
+							Package: "uuid",
+							Type:    "NullUUID",
 						},
 					},
 				},

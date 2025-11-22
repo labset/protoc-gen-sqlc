@@ -23,10 +23,8 @@ func main() {
 	}
 
 	response := &pluginpb.CodeGeneratorResponse{}
-	for _, protoFile := range request.GetProtoFile() {
-		if err = handler.ProtoFile(protoFile, response); err != nil {
-			log.Fatalf("failed to process proto file: %v", err)
-		}
+	if err = handler.ProcessProtoFiles(request.GetProtoFile(), response); err != nil {
+		log.Fatalf("failed to process proto files: %v", err)
 	}
 
 	respond(response)

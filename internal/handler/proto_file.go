@@ -6,18 +6,27 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-func ProtoFile(
-	file *descriptorpb.FileDescriptorProto,
+func ProcessProtoFiles(
+	files []*descriptorpb.FileDescriptorProto,
 	response *pluginpb.CodeGeneratorResponse,
 ) error {
-	messages := file.GetMessageType()
-	if len(messages) == 0 {
-		return nil
+	var domains []string
+
+	for _, file := range files {
+		if len(file.GetMessageType()) == 0 {
+			continue
+		}
+
+		domain := codegen.ExtractDomain(file.GetPackage())
+		if domain != "" {
+			domains = append(domains, domain)
+		}
 	}
 
-	// handle configuration
-	if configFile := codegen.GenerateSqlcConfigFile(file); configFile != nil {
-		response.File = append(response.File, configFile)
+	if len(domains) > 0 {
+		if configFile := codegen.GenerateSqlcConfigFileForDomains(domains); configFile != nil {
+			response.File = append(response.File, configFile)
+		}
 	}
 
 	// handle migrations (schema)
@@ -29,4 +38,12 @@ func ProtoFile(
 	//   queries/
 	//   migrations/
 	return nil
+}
+
+// Keep for backwards compatibility and testing
+func ProtoFile(
+	file *descriptorpb.FileDescriptorProto,
+	response *pluginpb.CodeGeneratorResponse,
+) error {
+	return ProcessProtoFiles([]*descriptorpb.FileDescriptorProto{file}, response)
 }
